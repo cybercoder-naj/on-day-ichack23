@@ -7,7 +7,6 @@ import {
     onAuthStateChanged,
     User
 } from '@firebase/auth'
-import { collection, getDocs } from 'firebase/firestore'
 import { KEY_LOCAL_EMAIL_SIGNIN } from "~~/constants"
 
 const actionCodeSettings: ActionCodeSettings = {
@@ -15,8 +14,8 @@ const actionCodeSettings: ActionCodeSettings = {
     handleCodeInApp: true
 }
 
-export const useFirebase = () => {
-    const { $auth, $firestore } = useNuxtApp()
+export default function () {
+    const { $auth } = useNuxtApp()
     const user = useState<User | null>("firebase_user", () => null)
 
     const initAuth = () => {
@@ -29,57 +28,53 @@ export const useFirebase = () => {
         })
     }
 
-    const verifyAlreadyRegisteredEmail = async (email: string): Promise<boolean> => {
-        const querySnapshot = await getDocs(collection($firestore, "RegisteredUsers"))
-        let emailPresent = false
-        querySnapshot.forEach(doc => {
-            if (email === doc.data().email) {
-                emailPresent = true
-                return
-            }
-        })
-        return emailPresent
-    }
-
-    const signInUserWithEmailLink = async (email: string) => {
+    const signInUserWithEmailLink = async (email: string): Promise<FirebaseResponse> => {
         try {
-            sendSignInLinkToEmail($auth, email, actionCodeSettings)
+            await sendSignInLinkToEmail($auth, email, actionCodeSettings)
             window.localStorage.setItem(KEY_LOCAL_EMAIL_SIGNIN, email)
-        } catch (err) {
-            console.log(err)
+            return { success: true }
+        } catch (error: unknown) {
+            console.error(error)
+            return error instanceof Error ?
+                { success: false, error } :
+                { success: false }
         }
     }
 
-    const verifyEmailLinkSignIn = async () => {
+    const verifyEmailLinkSignIn = async (): Promise<FirebaseResponse> => {
         if (isSignInWithEmailLink($auth, window.location.href)) {
             let email = window.localStorage.getItem(KEY_LOCAL_EMAIL_SIGNIN)
             if (!email)
                 email = window.prompt('Please provide your email for confirmation')
 
-            if (email === null) {
-                verifyEmailLinkSignIn()
-                return
-            }
+            if (email === null)
+                return verifyEmailLinkSignIn()
 
             try {
                 const result = await signInWithEmailLink($auth, email, window.location.href)
+                console.log(result)
                 if (result) {
-                    useRouter().push('/home')
+                    window.localStorage.removeItem(KEY_LOCAL_EMAIL_SIGNIN)
+                    return { success: true }
                 }
-                window.localStorage.removeItem(KEY_LOCAL_EMAIL_SIGNIN)
-            } catch (err) {
-                console.log(err)
+            } catch (error: unknown) {
+                console.error(error)
+                return error instanceof Error ? { success: false, error } : { success: false }
             }
+        }
+        return { success: false }
+    }
+
+    const signOutUser = async (): Promise<boolean> => {
+        try {
+            await signOut($auth)
+            return true
+        } catch (error: unknown) {
+            return false
         }
     }
 
-    const signOutUser = async () => {
-        signOut($auth)
-        useRouter().push('/login')
-    }
-
     return {
-        verifyAlreadyRegisteredEmail,
         signInUserWithEmailLink,
         verifyEmailLinkSignIn,
         signOutUser,

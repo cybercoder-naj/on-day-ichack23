@@ -1,6 +1,6 @@
 <script setup lang="ts">
 onMounted(() => {
-    const { initAuth } = useFirebase()
+    const { initAuth } = useFirebaseAuth()
     initAuth()
 })
 </script>

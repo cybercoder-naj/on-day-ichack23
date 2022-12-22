@@ -1,16 +1,23 @@
 <script setup lang="ts">
-const { user, signOutUser } = useFirebase()
+const { user, signOutUser } = useFirebaseAuth()
+const router = useRouter()
 
 onMounted(() => {
     if (!user || !user.value) {
-        const router = useRouter()
         router.push("/login")
     }
 })
+
+async function signOut() {
+    const res = await signOutUser()
+    if (res) {
+        router.push('/login')
+    }
+}
 </script>
 
 <template>
-{{ user }}
-<br><br>
-<button @click="signOutUser">Log out</button>
+    {{ user }}
+    <br><br>
+    <button @click="signOut">Log out</button>
 </template>

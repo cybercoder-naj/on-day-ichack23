@@ -1,22 +1,25 @@
 <script setup lang="ts">
-const { 
-    verifyAlreadyRegisteredEmail, 
-    signInUserWithEmailLink, 
+const { verifyAlreadyRegisteredEmail } = useFirestore()
+const {
+    signInUserWithEmailLink,
     verifyEmailLinkSignIn,
     user
-} = useFirebase()
+} = useFirebaseAuth()
 
 const email = ref("")
 const errorMessage = ref("")
 
 onMounted(async () => {
+    const router = useRouter()
     if (user && user.value) {
-        const router = useRouter()
         router.push("/home")
         return
     }
 
-    await verifyEmailLinkSignIn()
+    const res = await verifyEmailLinkSignIn()
+    if (res.success) {
+        router.push('/home')
+    }
 })
 
 async function trySignIn() {
@@ -26,14 +29,16 @@ async function trySignIn() {
         return
     }
 
-    await signInUserWithEmailLink(email.value)
+    const res = await signInUserWithEmailLink(email.value)
+    alert(res.success ? "Email has been sent" : res.error?.message)
 }
 </script>
 
 <template>
     <div id="login">
         <div class="container">
-            <img src="https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=" alt="place image here">
+            <img src="https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM="
+                alt="place image here">
 
             <form @submit.prevent="trySignIn">
                 <label for="email"></label>
@@ -91,5 +96,6 @@ form input[type="submit"] {
     padding: 12px;
     border-radius: 0.5em;
     margin-top: 2rem;
+    cursor: pointer;
 }
 </style>
