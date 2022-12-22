@@ -1,0 +1,1 @@
+export const KEY_LOCAL_EMAIL_SIGNIN = "emailForSignIn"
