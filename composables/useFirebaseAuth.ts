@@ -52,8 +52,8 @@ export default function () {
 
             try {
                 const result = await signInWithEmailLink($auth, email, window.location.href)
-                console.log(result)
                 if (result) {
+                    user.value = result.user
                     window.localStorage.removeItem(KEY_LOCAL_EMAIL_SIGNIN)
                     return { success: true }
                 }
@@ -68,6 +68,7 @@ export default function () {
     const signOutUser = async (): Promise<boolean> => {
         try {
             await signOut($auth)
+            user.value = null
             return true
         } catch (error: unknown) {
             return false

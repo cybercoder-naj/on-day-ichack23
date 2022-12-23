@@ -18,6 +18,7 @@ onMounted(async () => {
 
     const res = await verifyEmailLinkSignIn()
     if (res.success) {
+        console.debug("Router pushing /home", router)
         router.push('/home')
     }
 })
