@@ -10,7 +10,7 @@ import {
 import { KEY_LOCAL_EMAIL_SIGNIN } from "~~/constants"
 
 const actionCodeSettings: ActionCodeSettings = {
-    url: 'http://localhost:3000/login',
+    url: 'http://localhost:3000/login/verify',
     handleCodeInApp: true
 }
 
