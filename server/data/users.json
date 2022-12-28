@@ -1,0 +1,15 @@
+[
+    {
+        "User_ID": 1234,
+        "Order Date": "####",
+        "Attendee Status": "Attended",
+        "Name": "Nishant A Jalan",
+        "Email": "cybercoder.nishant@gmail.com",
+        "Event Name": "IC Hack 23",
+        "Ticket Quantity": 1,
+        "Ticket Type": "General Admission",
+        "Ticket Price": "$0.00",
+        "Buyer Name": "Nishant A Jalan",
+        "Buyer Email": "cybercoder.nishant@gmail.com"
+    }
+]

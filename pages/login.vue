@@ -24,7 +24,7 @@ onMounted(async () => {
 })
 
 async function trySignIn() {
-    const isRegisteredEmail = await verifyAlreadyRegisteredEmail(email.value)
+    const { data: isRegisteredEmail } = await useFetch(`/api/verifyRegistered?email=${email.value}`)
     if (!isRegisteredEmail) {
         errorMessage.value = "You are not allowed to sign in"
         return
